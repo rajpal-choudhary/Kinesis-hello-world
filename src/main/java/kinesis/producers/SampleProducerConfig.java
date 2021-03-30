@@ -1,29 +1,34 @@
 package kinesis.producers;
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.kinesis.producer.KinesisProducerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SampleProducerConfig {
+    /**
+     * Change this to your stream name.
+     */
+    public static final String STREAM_NAME_DEFAULT = "test";
+    /**
+     * Change this to the region you are using.
+     */
+    public static final String REGION_DEFAULT = "us-west-1";
     private static final Logger log = LoggerFactory.getLogger(SampleProducerConfig.class);
     /**
      * Change these to try larger or smaller records.
      */
     private static final int DATA_SIZE_DEFAULT = 128;
-
     /**
      * Put records for this number of seconds before exiting.
      */
     private static final int SECONDS_TO_RUN_DEFAULT = 5;
-
     /**
      * Put this number of records per second.
-     *
+     * <p>
      * Because multiple logical records are combined into each Kinesis record,
      * even a single shard can handle several thousand records per second, even
      * though there is a limit of 1000 Kinesis records per shard per second.
-     *
+     * <p>
      * If a shard gets throttled, the KPL will continue to retry records until
      * either they succeed or reach a TTL set in the KPL's configuration, at
      * which point the KPL will return failures for those records.
@@ -31,16 +36,6 @@ public class SampleProducerConfig {
      * @see {@link KinesisProducerConfiguration#setRecordTtl(long)}
      */
     private static final int RECORDS_PER_SECOND_DEFAULT = 2000;
-
-    /**
-     * Change this to your stream name.
-     */
-    public static final String STREAM_NAME_DEFAULT = "test";
-
-    /**
-     * Change this to the region you are using.
-     */
-    public static final String REGION_DEFAULT = "us-west-1";
 /*
 
     @NotBlank(message = "KPL Sample region should not be null or blank" )
@@ -72,25 +67,9 @@ public class SampleProducerConfig {
     private long requestTimeoutInMillis;
 */
 
-    public static String getArgIfPresent(final String[] args, final int index, final String defaultValue) {
-        return args.length > index ? args[index] : defaultValue;
-    }
-
-    public static int getIntArgIfPresent(final String[] args, final int index, final String defaultValue) {
-        return Integer.parseInt(getArgIfPresent(args, index, defaultValue));
-    }
-
-    public static long getLongArgIfPresent(final String[] args, final int index, final String defaultValue) {
-        return Long.parseLong(getArgIfPresent(args, index, defaultValue));
-    }
-
-    public static boolean getBooleanArgIfPresent(final String[] args, final int index, final String defaultValue) {
-        return Boolean.parseBoolean(getArgIfPresent(args, index, defaultValue));
-    }
-
     /**
      * Parses the commandline input to produce a Config object
-     **  @param args  The command line args for the Sample Producer. It takes 13 optional position parameters:
+     * *  @param args  The command line args for the Sample Producer. It takes 13 optional position parameters:
      * 1. The stream name to use, test is default.
      * 2. The region name to use, us-west-1 in default.
      * 3. The duration of the test in seconds, 5 is the default.
@@ -141,6 +120,22 @@ public class SampleProducerConfig {
         /*if(!violations.isEmpty()){
             System.exit(1);
         }*/
+    }
+
+    public static String getArgIfPresent(final String[] args, final int index, final String defaultValue) {
+        return args.length > index ? args[index] : defaultValue;
+    }
+
+    public static int getIntArgIfPresent(final String[] args, final int index, final String defaultValue) {
+        return Integer.parseInt(getArgIfPresent(args, index, defaultValue));
+    }
+
+    public static long getLongArgIfPresent(final String[] args, final int index, final String defaultValue) {
+        return Long.parseLong(getArgIfPresent(args, index, defaultValue));
+    }
+
+    public static boolean getBooleanArgIfPresent(final String[] args, final int index, final String defaultValue) {
+        return Boolean.parseBoolean(getArgIfPresent(args, index, defaultValue));
     }
 
     /*public String getRegion() {
@@ -199,7 +194,7 @@ public class SampleProducerConfig {
         return requestTimeoutInMillis;
     }*/
 
-    public KinesisProducerConfiguration transformToKinesisProducerConfiguration(){
+    public KinesisProducerConfiguration transformToKinesisProducerConfiguration() {
         // There are many configurable parameters in the KPL. See the javadocs
         // on each each set method for details.
         KinesisProducerConfiguration config = new KinesisProducerConfiguration();

@@ -1,21 +1,16 @@
 package kinesis.producers;
 
-import com.amazonaws.services.kinesis.producer.Attempt;
 import com.amazonaws.services.kinesis.producer.KinesisProducer;
-//import com.amazonaws.services.kinesis.producer.UnexpectedMessageException;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-
-import org.apache.http.concurrent.FutureCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+//import com.amazonaws.services.kinesis.producer.UnexpectedMessageException;
 
 public class HelloProducer {
     private static final Logger log = LoggerFactory.getLogger(HelloProducer.class);
@@ -27,9 +22,10 @@ public class HelloProducer {
      */
     private static final String TIMESTAMP = Long.toString(System.currentTimeMillis());
 
-    /** The main method.
-     *  @param args  The command line args for the Sample Producer.
+    /**
+     * The main method.
      *
+     * @param args The command line args for the Sample Producer.
      */
     public static void main(String[] args) throws Exception {
         final SampleProducerConfig config = new SampleProducerConfig(args);
@@ -106,7 +102,7 @@ public class HelloProducer {
                         "Put %d of %d so far (%.2f %%), %d have completed (%.2f %%)",
                         put, total, putPercent, done, donePercent));*/
                 //log.info(String.format("Oldest future as of now in millis is %s", producer.getOldestRecordTimeInMillis
-                 //       ()));
+                //       ()));
             }
         }, 1, 1, TimeUnit.SECONDS);
 
@@ -144,17 +140,12 @@ public class HelloProducer {
      * ScheduledExecutorService. The executor is shutdown at the end. This is
      * more precise than simply using scheduleAtFixedRate.
      *
-     * @param exec
-     *            Executor
-     * @param task
-     *            Task to perform
-     * @param counter
-     *            Counter used to track how many times the task has been
-     *            executed
-     * @param durationSeconds
-     *            How many seconds to run for
-     * @param ratePerSecond
-     *            How many times to execute task per second
+     * @param exec            Executor
+     * @param task            Task to perform
+     * @param counter         Counter used to track how many times the task has been
+     *                        executed
+     * @param durationSeconds How many seconds to run for
+     * @param ratePerSecond   How many times to execute task per second
      */
     private static void executeAtTargetRate(
             final ScheduledExecutorService exec,
