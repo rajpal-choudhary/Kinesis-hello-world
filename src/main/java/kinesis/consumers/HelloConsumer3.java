@@ -29,47 +29,24 @@ public class HelloConsumer3 {
         clientBuilder.setClientConfiguration(getKinesisConsumer());
         AmazonKinesis kinesisClient = clientBuilder.build();
 
-        // Retrieve the Shards from a Stream
-        DescribeStreamRequest describeStreamRequest = new DescribeStreamRequest().withStreamName(STREAM_NAME);
-        List<Shard> shards = new ArrayList<>();
+        //DescribeStreamResult streamRes;
+        for (Shard shard : kinesisClient.describeStream(STREAM_NAME).getStreamDescription().getShards()) {
+            GetShardIteratorRequest itReq = new GetShardIteratorRequest()
+                    .withStreamName(STREAM_NAME)
+                    .withShardIteratorType(ShardIteratorType.TRIM_HORIZON)
+                    .withShardId(shard.getShardId());
 
-        DescribeStreamResult streamRes;
-        do {
-            streamRes = kinesisClient.describeStream(describeStreamRequest);
-            shards.addAll(streamRes.getStreamDescription().getShards());
-            /*String lastShardId = null;
-            if (shards.size() > 0) {
-                lastShardId = shards.get(shards.size() - 1).getShardId();
-            }*/
-        } while (streamRes.getStreamDescription().isHasMoreShards());
+            GetShardIteratorResult shardIteratorResult = kinesisClient.getShardIterator(itReq);
+            String shardIterator = shardIteratorResult.getShardIterator();
 
-        GetShardIteratorRequest itReq = new GetShardIteratorRequest()
-                .withStreamName(STREAM_NAME)
-                .withShardIteratorType(ShardIteratorType.TRIM_HORIZON)
-                .withShardId(shards.get(0).getShardId());
+            GetRecordsRequest recordsRequest = new GetRecordsRequest();
+            recordsRequest.setShardIterator(shardIterator);
 
-        String shardIterator;
-        GetShardIteratorResult shardIteratorResult = kinesisClient.getShardIterator(itReq);
-        shardIterator = shardIteratorResult.getShardIterator();
-
-        // Continuously read data records from shard.
-        List<Record> records;
-
-        // Create new GetRecordsRequest with existing shardIterator.
-        // Set maximum records to return to 1000.
-        GetRecordsRequest recordsRequest = new GetRecordsRequest();
-        recordsRequest.setShardIterator(shardIterator);
-
-        GetRecordsResult result = kinesisClient.getRecords(recordsRequest);
-
-        // Put result into record list. Result may be empty.
-        records = result.getRecords();
-
-        // Print records
-        for (Record record : records) {
-            ByteBuffer byteBuffer = record.getData();
-            System.out.println(String.format("Seq No: %s - %s", record.getSequenceNumber(),
-                    new String(byteBuffer.array())));
+            for (Record record : kinesisClient.getRecords(recordsRequest).getRecords()) {
+                ByteBuffer byteBuffer = record.getData();
+                System.out.println(String.format("Seq No: %s - %s", record.getSequenceNumber(),
+                        new String(byteBuffer.array())));
+            }
         }
     }
 }
